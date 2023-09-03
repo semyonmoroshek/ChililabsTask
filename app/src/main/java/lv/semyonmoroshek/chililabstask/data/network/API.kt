@@ -10,6 +10,8 @@ interface API {
     @GET("gifs/search")
     suspend fun searchGifs(
         @Query("api_key") apiKey: String,
-        @Query("q") query: String
+        @Query("q") query: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
     ): Response<GiphyApiResponse>
 }

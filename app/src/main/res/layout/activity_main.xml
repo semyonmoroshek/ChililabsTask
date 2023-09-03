@@ -28,6 +28,7 @@
             android:minHeight="40dp"
             android:padding="6dp"
             android:textColor="@color/data"
+            android:imeOptions="flagNoExtractUi"
             android:textSize="16sp"/>
 
         <androidx.appcompat.widget.AppCompatButton

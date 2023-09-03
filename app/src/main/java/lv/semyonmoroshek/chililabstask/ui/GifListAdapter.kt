@@ -4,19 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import lv.semyonmoroshek.chililabstask.R
 import lv.semyonmoroshek.chililabstask.data.model.Data
 
-class GifListAdapter() : RecyclerView.Adapter<GifListAdapter.ViewHolder>() {
-
-    private var imgList = mutableListOf<Data>()
-
-    fun setUpdatedData(items: List<Data>) {
-        this.imgList = items.toMutableList()
-        notifyDataSetChanged()
-    }
+class GifListAdapter() : PagingDataAdapter<Data, GifListAdapter.ViewHolder>(GifComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater
@@ -27,10 +22,9 @@ class GifListAdapter() : RecyclerView.Adapter<GifListAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val gifItem = imgList.getOrNull(position) ?: return
-        val gifUrl = gifItem.images?.original?.url
+        val gifItem = getItem(position)
+        val gifUrl = gifItem?.images?.original?.url
         val context = holder.itemView.context
-
 
         gifUrl?.let {
             Glide.with(context)
@@ -41,12 +35,18 @@ class GifListAdapter() : RecyclerView.Adapter<GifListAdapter.ViewHolder>() {
         }
     }
 
-    override fun getItemCount(): Int {
-        return imgList.size
-    }
-
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgGif: ImageView = itemView.findViewById(R.id.img_gif)
 
+    }
+
+    object GifComparator: DiffUtil.ItemCallback<Data>() {
+        override fun areItemsTheSame(oldItem: Data, newItem: Data): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Data, newItem: Data): Boolean {
+            return oldItem == newItem
+        }
     }
 }

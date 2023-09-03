@@ -28,16 +28,16 @@ class Repository(
     var repositoryError = MutableLiveData(ApiError())
 
 
-    suspend fun searchGifs(query: String): GiphyApiResponse? {
-        val apiKey = "BGuJYFEoriMJZQM51jitfQ6PyAwSul7L"
-        val response = apiService.searchGifs(apiKey, query)
-        return if (response.isSuccessful) {
-            response.body()
-        } else {
-            postError(response.message())
-            null
-        }
-    }
+//    suspend fun searchGifs(query: String): GiphyApiResponse? {
+//        val apiKey = "BGuJYFEoriMJZQM51jitfQ6PyAwSul7L"
+//        val response = apiService.searchGifs(apiKey, query)
+//        return if (response.isSuccessful) {
+//            response.body()
+//        } else {
+//            postError(response.message())
+//            null
+//        }
+//    }
 
     private fun postError(errorMsg: String) {
         repositoryError.postValue(ApiError(msg = errorMsg))

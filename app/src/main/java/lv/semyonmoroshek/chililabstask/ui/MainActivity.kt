@@ -1,13 +1,11 @@
 package lv.semyonmoroshek.chililabstask.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import lv.semyonmoroshek.chililabstask.databinding.ActivityMainBinding
 import lv.semyonmoroshek.chililabstask.utils.hide
 import lv.semyonmoroshek.chililabstask.utils.show
@@ -15,6 +13,7 @@ import lv.semyonmoroshek.chililabstask.utils.show
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
     private lateinit var viewModel: MainViewModel
     private lateinit var mAdapter: GifListAdapter
 
@@ -33,7 +32,9 @@ class MainActivity : AppCompatActivity() {
         binding.edtAddress.addTextChangedListener { query ->
             if (!query.isNullOrEmpty()) {
                 binding.btnClear.show()
-                viewModel.searchGif(query.toString())
+                viewModel.searchGif(query.toString()).observe(this) {
+                    mAdapter.submitData(lifecycle, it)
+                }
             } else {
                 binding.btnClear.hide()
             }
@@ -50,16 +51,15 @@ class MainActivity : AppCompatActivity() {
     private fun initListener() {
         binding.btnClear.setOnClickListener {
             binding.edtAddress.setText("")
-            mAdapter.setUpdatedData(listOf())
         }
     }
 
     private fun initObserver() {
-        viewModel.searchGifResp.observe(this) { resp ->
-            resp?.data?.let {gifList ->
-                mAdapter.setUpdatedData(gifList)
-            }
-        }
+//        viewModel.searchGifRespData.observe(this) { resp ->
+//            resp?.data?.let { gifList ->
+//                mAdapter.submitData()
+//            }
+//        }
     }
 }
 

@@ -1,9 +1,9 @@
 package lv.semyonmoroshek.chililabstask.data.model
 
 data class GiphyApiResponse(
-    val data: List<Data>? = null,
+    val data: List<Data> = listOf(),
     val meta: Meta? = null,
-    val pagination: Pagination? = null
+    val pagination: Pagination = Pagination()
 )
 
 data class Data(
@@ -37,9 +37,9 @@ data class Meta(
 )
 
 data class Pagination(
-    val count: Int? = null,
-    val offset: Int? = null,
-    val total_count: Int? = null
+    val count: Int = 0,
+    val offset: Int = 0,
+    val total_count: Int = 0
 )
 
 data class Analytics(
