@@ -2,48 +2,50 @@ package lv.semyonmoroshek.chililabstask.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lv.semyonmoroshek.chililabstask.data.model.Data
-import lv.semyonmoroshek.chililabstask.data.network.ApiClient
+import lv.semyonmoroshek.chililabstask.data.network.API
 import lv.semyonmoroshek.chililabstask.data.repository.GifPagingSource
-import lv.semyonmoroshek.chililabstask.data.repository.Repository
+import javax.inject.Inject
 
-class MainViewModel(
-//    private val repository: Repository
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val api: API
 ) : ViewModel() {
-
-    private val repository = Repository()
 
     private var searchJob: Job? = null
 
-    private val _searchGifResp = MutableLiveData<PagingData<Data>>()
-    val searchGifRespData: LiveData<PagingData<Data>> = _searchGifResp
     fun searchGif(query: String): LiveData<PagingData<Data>> {
-        return Pager(
-            config = PagingConfig(10),
-            pagingSourceFactory = {
-                GifPagingSource(ApiClient.apiService, query)
+        return if (query.isBlank()) {
+            searchJob?.cancel()
+            liveData {
+                emit(PagingData.empty())
             }
-        ).liveData.debounce(300, viewModelScope).cachedIn(viewModelScope)
+        } else {
+            Pager(
+                config = PagingConfig(10),
+                pagingSourceFactory = {
+                    GifPagingSource(api, query)
+                }
+            ).liveData.debounce(300, viewModelScope).cachedIn(viewModelScope)
+        }
     }
 
-    fun <T> LiveData<T>.debounce(duration: Long = 1000L, coroutineScope: CoroutineScope) =
+    private fun <T> LiveData<T>.debounce(duration: Long = 1000L, coroutineScope: CoroutineScope) =
         MediatorLiveData<T>().also { mld ->
-
             val source = this
-
             mld.addSource(source) {
                 searchJob?.cancel()
                 searchJob = coroutineScope.launch {

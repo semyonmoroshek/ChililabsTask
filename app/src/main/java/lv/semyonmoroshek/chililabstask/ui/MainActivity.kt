@@ -1,50 +1,37 @@
 package lv.semyonmoroshek.chililabstask.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import lv.semyonmoroshek.chililabstask.databinding.ActivityMainBinding
-import lv.semyonmoroshek.chililabstask.utils.hide
-import lv.semyonmoroshek.chililabstask.utils.show
 
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var viewModel: MainViewModel
-    private lateinit var mAdapter: GifListAdapter
-
+    private val viewModel by viewModels<MainViewModel>()
+    private val mAdapter: GifListAdapter by lazy {
+        GifListAdapter()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
         initView()
         initListener()
-        initObserver()
-
-        binding.edtAddress.addTextChangedListener { query ->
-            if (!query.isNullOrEmpty()) {
-                binding.btnClear.show()
-                viewModel.searchGif(query.toString()).observe(this) {
-                    mAdapter.submitData(lifecycle, it)
-                }
-            } else {
-                binding.btnClear.hide()
-            }
-        }
     }
 
     private fun initView() {
         val recyclerView = binding.rvGifList
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        mAdapter = GifListAdapter()
         recyclerView.adapter = mAdapter
     }
 
@@ -52,14 +39,13 @@ class MainActivity : AppCompatActivity() {
         binding.btnClear.setOnClickListener {
             binding.edtAddress.setText("")
         }
-    }
 
-    private fun initObserver() {
-//        viewModel.searchGifRespData.observe(this) { resp ->
-//            resp?.data?.let { gifList ->
-//                mAdapter.submitData()
-//            }
-//        }
+        binding.edtAddress.addTextChangedListener { query ->
+            viewModel.searchGif(query.toString()).observe(this) {
+                mAdapter.submitData(lifecycle, it)
+            }
+            binding.btnClear.isVisible = !query.isNullOrEmpty()
+        }
     }
 }
 

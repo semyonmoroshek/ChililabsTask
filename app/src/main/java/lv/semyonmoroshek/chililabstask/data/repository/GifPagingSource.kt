@@ -1,11 +1,9 @@
 package lv.semyonmoroshek.chililabstask.data.repository
 
-import android.system.ErrnoException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import lv.semyonmoroshek.chililabstask.data.model.Data
 import lv.semyonmoroshek.chililabstask.data.network.API
-import lv.semyonmoroshek.chililabstask.data.network.ApiClient
 
 class GifPagingSource(
     private val api: API,
@@ -23,11 +21,11 @@ class GifPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Data> {
         val currentPage = params.key ?: 0
-        val response = ApiClient.apiService.searchGifs(apiKey, query, currentPage * 10, 10)
+        val response = api.searchGifs(apiKey, query, currentPage * 10, 10)
         return if (response.isSuccessful) {
             val resp = response.body()!!
 
-            LoadResult.Page<Int, Data>(
+            LoadResult.Page(
                 resp.data,
                 if (currentPage == 0) null else currentPage - 1,
                 if (resp.pagination.offset + resp.pagination.count > resp.pagination.total_count) {

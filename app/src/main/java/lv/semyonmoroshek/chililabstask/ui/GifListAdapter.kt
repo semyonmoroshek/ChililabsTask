@@ -17,7 +17,6 @@ class GifListAdapter() : PagingDataAdapter<Data, GifListAdapter.ViewHolder>(GifC
         val view = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.gif_item, parent, false)
-
         return ViewHolder(view)
     }
 
@@ -37,7 +36,6 @@ class GifListAdapter() : PagingDataAdapter<Data, GifListAdapter.ViewHolder>(GifC
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgGif: ImageView = itemView.findViewById(R.id.img_gif)
-
     }
 
     object GifComparator: DiffUtil.ItemCallback<Data>() {
